@@ -10,24 +10,19 @@ function App() {
   });
 
   useEffect(() => {
-    fetch("/api/students")
+    fetch("http://localhost:5000/api/students")
       .then((response) => response.json())
       .then((data) => setStudents(data))
       .catch((error) => console.error("Lỗi:", error));
   }, []);
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
+  // ...existing code...
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/students", {
+      const response = await fetch("http://localhost:5000/api/students", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -35,92 +30,52 @@ function App() {
         body: JSON.stringify(form)
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Có lỗi xảy ra");
-        return;
-      }
-
-      setStudents([...students, data]);
-
-      setForm({
-        studentId: "",
-        name: "",
-        email: ""
-      });
-
-      alert("Thêm sinh viên thành công!");
+      // ...existing code...
     } catch (error) {
       console.error("Lỗi:", error);
       alert("Không thể kết nối đến server");
     }
   };
 
-  return (
-    <div>
-      <h1>Quản lý sinh viên</h1>
+  const handleUpdate = async (student) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/students/${student._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          studentId: student.studentId,
+          name: student.name,
+          email: student.email
+        })
+      });
 
-      <h2>Thêm sinh viên</h2>
+      // ...existing code...
+    } catch (error) {
+      console.error("Lỗi:", error);
+      alert("Không thể kết nối đến server");
+    }
+  };
 
-      <form onSubmit={handleSubmit}>
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) {
+      return;
+    }
 
-        
-        <div>
-          <label>MSSV: </label>
-          <input
-            type="text"
-            name="studentId"
-            value={form.studentId}
-            onChange={handleChange}
-            placeholder="Nhập MSSV"
-          />
-        </div>
+    try {
+      const response = await fetch(`http://localhost:5000/api/students/${id}`, {
+        method: "DELETE"
+      });
 
-        <br />
+      // ...existing code...
+    } catch (error) {
+      console.error("Lỗi:", error);
+      alert("Không thể kết nối đến server");
+    }
+  };
 
-        <div>
-          <label>Họ tên: </label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Nhập họ tên"
-          />
-        </div>
-
-        <br />
-
-        <div>
-          <label>Email: </label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Nhập email"
-          />
-        </div>
-
-        <br />
-
-        <button type="submit">Thêm sinh viên</button>
-
-        
-      </form>
-
-      <h2>Danh sách sinh viên</h2>
-
-      <ul>
-        {students.map((student) => (
-          <li key={student._id}>
-            {student.studentId} - {student.name} - {student.email}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  // ...existing code...
 }
 
 export default App;
