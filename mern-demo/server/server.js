@@ -80,4 +80,94 @@ app.listen(PORT, HOST, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+ // Thêm sinh viên
+app.post("/api/students", async (req, res) => {
+  try {
+    const { studentId, name, email } = req.body;
+
+    if (!studentId || !name || !email) {
+      return res.status(400).json({
+        message: "Vui lòng nhập đầy đủ mã sinh viên, họ tên và email."
+      });
+    }
+
+    const student = await Student.create({
+      studentId: studentId.trim(),
+      name: name.trim(),
+      email: email.trim()
+    });
+
+    res.status(201).json({
+      message: "Thêm sinh viên thành công!",
+      student
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "Mã sinh viên hoặc email đã tồn tại."
+      });
+    }
+
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Sửa sinh viên
+app.put("/api/students/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { studentId, name, email } = req.body;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "ID sinh viên không hợp lệ." });
+    }
+
+    if (!studentId || !name || !email) {
+      return res.status(400).json({
+        message: "Vui lòng nhập đầy đủ mã sinh viên, họ tên và email."
+      });
+    }
+
+    const student = await Student.findByIdAndUpdate(
+      id,
+      {
+        studentId: studentId.trim(),
+        name: name.trim(),
+        email: email.trim()
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!student) {
+      return res.status(404).json({ message: "Không tìm thấy sinh viên." });
+    }
+
+    res.json({ message: "Cập nhật thành công!", student });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Xóa sinh viên
+app.delete("/api/students/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "ID sinh viên không hợp lệ." });
+    }
+
+    const student = await Student.findByIdAndDelete(id);
+
+    if (!student) {
+      return res.status(404).json({ message: "Không tìm thấy sinh viên." });
+    }
+
+    res.json({ message: "Xóa sinh viên thành công!" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 
