@@ -1,4 +1,4 @@
-
+const cors = require("cors");
 require("dotenv").config({
   path: require("path").resolve(__dirname, "../../.env")
 });
@@ -8,6 +8,11 @@ const mongoose = require("mongoose");
 const Student = require("./models/Student");
 
 const app = express();
+app.use(cors({
+  origin: "https://mern-frontend-n6r0.onrender.com",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(express.json());
 
