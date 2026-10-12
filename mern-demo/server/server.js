@@ -1,6 +1,7 @@
 
 const cors = require("cors");
 const path = require("path");
+
 require("dotenv").config({
   path: path.resolve(__dirname, "../../.env")
 });
@@ -11,16 +12,16 @@ const Student = require("./models/Student");
 
 const app = express();
 
-// ================================
+// ========================================
 // 1. CAU HINH SERVER
-// ================================
+// ========================================
 
 const HOST = "0.0.0.0";
 const PORT = process.env.PORT || 5000;
 
-// ================================
+// ========================================
 // 2. CAU HINH CORS CHO FRONTEND
-// ================================
+// ========================================
 
 app.use(
   cors({
@@ -32,9 +33,9 @@ app.use(
 
 app.use(express.json());
 
-// ================================
+// ========================================
 // 3. KET NOI MONGODB ATLAS
-// ================================
+// ========================================
 
 const mongoUri = process.env.MONGODB_URI;
 
@@ -61,9 +62,40 @@ if (!mongoUri) {
     });
 }
 
-// ================================
-// 4. HEALTH CHECK CHO RENDER
-// ================================
+// ========================================
+// 4. TRANG GIOI THIEU API
+// GET /
+// ========================================
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "MERN Backend API - Buoi 5-6",
+    endpoints: {
+      hello: "GET /api/hello",
+      list: "GET /api/students",
+      create: "POST /api/students",
+      update: "PUT /api/students/:id",
+      remove: "DELETE /api/students/:id",
+      health: "GET /health"
+    }
+  });
+});
+
+// ========================================
+// 5. API HELLO
+// GET /api/hello
+// ========================================
+
+app.get("/api/hello", (req, res) => {
+  res.status(200).json({
+    message: "Xin chao! MERN Backend API dang hoat dong."
+  });
+});
+
+// ========================================
+// 6. HEALTH CHECK CHO RENDER
+// GET /health
+// ========================================
 
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -78,10 +110,10 @@ app.get("/health", (req, res) => {
   });
 });
 
-// ================================
-// 5. LAY DANH SACH SINH VIEN
+// ========================================
+// 7. LAY DANH SACH SINH VIEN
 // GET /api/students
-// ================================
+// ========================================
 
 app.get("/api/students", async (req, res) => {
   try {
@@ -99,7 +131,7 @@ app.get("/api/students", async (req, res) => {
     console.log("MODEL COLLECTION:", Student.collection.name);
     console.log("STUDENT COUNT:", students.length);
 
-    res.status(200).json({
+    return res.status(200).json({
       database: db.databaseName,
       modelCollection: Student.collection.name,
       availableCollections: collections.map((c) => c.name),
@@ -109,17 +141,17 @@ app.get("/api/students", async (req, res) => {
   } catch (error) {
     console.error("GET STUDENTS ERROR:", error.message);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Khong the lay danh sach sinh vien.",
       error: error.message
     });
   }
 });
 
-// ================================
-// 6. THEM SINH VIEN
+// ========================================
+// 8. THEM SINH VIEN
 // POST /api/students
-// ================================
+// ========================================
 
 app.post("/api/students", async (req, res) => {
   try {
@@ -166,10 +198,10 @@ app.post("/api/students", async (req, res) => {
   }
 });
 
-// ================================
-// 7. SUA THONG TIN SINH VIEN
+// ========================================
+// 9. SUA THONG TIN SINH VIEN
 // PUT /api/students/:id
-// ================================
+// ========================================
 
 app.put("/api/students/:id", async (req, res) => {
   try {
@@ -236,10 +268,10 @@ app.put("/api/students/:id", async (req, res) => {
   }
 });
 
-// ================================
-// 8. XOA SINH VIEN
+// ========================================
+// 10. XOA SINH VIEN
 // DELETE /api/students/:id
-// ================================
+// ========================================
 
 app.delete("/api/students/:id", async (req, res) => {
   try {
@@ -274,21 +306,21 @@ app.delete("/api/students/:id", async (req, res) => {
   }
 });
 
-// ================================
-// 9. API KHONG TON TAI
-// ================================
+// ========================================
+// 11. API KHONG TON TAI
+// ========================================
 
 app.use((req, res) => {
-  res.status(404).json({
+  return res.status(404).json({
     message: "Khong tim thay API.",
     path: req.originalUrl
   });
 });
 
-// ================================
-// 10. KHOI DONG SERVER
+// ========================================
+// 12. KHOI DONG SERVER
 // LUON DAT CUOI FILE
-// ================================
+// ========================================
 
 app.listen(PORT, HOST, () => {
   console.log(`Server running on ${HOST}:${PORT}`);
